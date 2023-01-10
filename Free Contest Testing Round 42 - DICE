@@ -1,0 +1,62 @@
+#include <iostream>
+using namespace std;
+
+long long  *a;
+long long N,temp=0;
+long long count=0;
+long long MIN = 1000000000;
+
+bool thoa_man(long long i, long long n) 
+{
+    if (n==0)
+        return true;
+    else
+    {
+        if (i<=a[n-1] && a[n-1] <=6)
+            return true;
+        else return false;
+    }
+}
+
+void inra(long long n)
+{
+    /*for (int i=0; i<=n; i++)
+        cout << a[i] << "  " ;
+    cout << n << endl;*/
+    if (N<=6) MIN = 1;
+    if (n < MIN) MIN = n+1;
+    //cout << MIN << endl;
+    cout << 7*(MIN)-N << " " << 7*(N) - N ;
+    cout << endl;
+}
+
+void chon_so_hang(long long n=0)
+{
+    
+    for (long long i=N-1; i>=1; i--)
+    {
+        if (thoa_man(i,n))
+        {
+            a[n]=i;
+            temp+=i;
+            if (temp==N) {
+                inra(n);
+                exit(0);
+                }
+            else if (temp < N )
+                chon_so_hang(n+1);
+            temp -= i;
+            
+        }
+    }
+}
+
+
+int main()
+{
+    cin >> N;
+    a=new long long [N];
+
+    chon_so_hang();
+    return 0;
+}
