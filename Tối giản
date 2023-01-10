@@ -1,0 +1,62 @@
+#include <bits/stdc++.h>
+#define int long long
+#define ii pair<int, int>
+#define st first
+#define nd second
+
+using namespace std;
+const int MAXN = 3e5 + 5;
+const int LOG = 17;
+int n, a[MAXN], l[MAXN], r[MAXN];
+int gcd[MAXN][LOG + 2];
+void prep(){
+    stack<int> L, R;
+    for (int i = 1; i <= n; i++){
+        while (L.size() && a[L.top()] > a[i]) L.pop();
+        l[i] = L.size() ? L.top() + 1 : 1;
+        L.push(i);
+    }
+    for (int i = n; i >= 1; i--){
+        while (R.size() && a[R.top()] > a[i]) R.pop();
+        r[i] = R.size() ? R.top() - 1 : n;
+        R.push(i);
+    }
+}
+void buildRMQ(){
+    for (int i = 1; i <= n; i++) gcd[i][0] = a[i];
+    for (int k = 1; (1 << k) <= n; k++){
+        for (int i = 1; i + (1 << k) <= n + 1; i++){
+            gcd[i][k] = __gcd(gcd[i][k - 1], gcd[i + (1 << (k - 1))][k - 1]);
+        }
+    }
+}
+int getGCD(int l, int r){
+    int log = log2(r - l + 1);
+    return __gcd(gcd[l][log], gcd[r - (1 << log) + 1][log]);
+}
+signed main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    prep();
+    buildRMQ();
+    int ans = 0;
+    for (int i = 1; i <= n; i++){
+        int fl = i, fr = i;
+        int le = l[i], ri = i;
+        while (le <= ri){
+            int mid = (le + ri) >> 1;
+            if (getGCD(mid, i) == a[i]) fl = mid, ri = mid - 1;
+            else le = mid + 1;
+        }
+        le = i, ri = r[i];
+        while (le <= ri){
+            int mid = (le + ri) >> 1;
+            if (getGCD(i, mid) == a[i]) fr = mid, le = mid + 1;
+            else ri = mid - 1;
+        }
+        ans += (fr - i + 1) * (i - fl + 1) - 1;
+    }
+    cout << ans; 
+}
