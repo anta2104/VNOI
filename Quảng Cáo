@@ -1,0 +1,31 @@
+#include<cstdio>
+#include<vector>
+#include<queue>
+using namespace std;
+
+vector<vector<int> > g;
+int n, m;
+bool vst[2000];
+
+int main() {
+    scanf("%d%d", &n, &m); g.resize(n);
+    for(int i = 0; i < m; ++i) {
+        int x, y; scanf("%d%d", &x, &y);
+        g[--x].push_back(--y);
+        g[y].push_back(x);
+    }
+    int k = 0; //number of connected component
+    for(int i = 0; i < n; ++i) if(!vst[i]) {
+        ++k; queue<int> qu; qu.push(i);
+        while(!qu.empty()) {
+            int u = qu.front(); qu.pop();
+            for(vector<int>::iterator it = g[u].begin(); it != g[u].end(); ++it) 
+                if(!vst[*it]) {
+                    vst[*it] = 1;
+                    qu.push(*it);
+                }
+        }
+    }
+    printf("%d\n", m - n + k);
+    return 0;
+}
