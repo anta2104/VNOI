@@ -1,0 +1,52 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int n,a[5][555],b[255255],cntB[255255],B,c[255255],cntC[255255],C,S;
+long long ans;
+
+int modify(int b[],int cntB[],int B)
+{
+    int res=1;
+    sort(b,b+B);
+    cntB[0]=1;
+    for (int i=1;i<B;i++)
+    {
+        if (b[i]!=b[res-1]) b[res++]=b[i];
+        cntB[res-1]++;
+    }
+    return res;
+}
+
+int main()
+{
+    cin >> n >> S;
+    for (int i=0;i<5;i++)
+        for (int j=0;j<n;j++)
+            cin >> a[i][j];
+
+    for (int i=0;i<n;i++)
+        for (int j=0;j<n;j++)   
+        {
+            b[B++]=a[0][i]+a[1][j];
+            c[C++]=a[2][i]+a[3][j];
+        }
+
+    B=modify(b,cntB,B);
+    C=modify(c,cntC,C);
+
+    for (int i=0;i<n;i++)
+    {
+        int target=S-a[4][i];
+        for (int j=0,k=C-1;j<B && k>=0;)
+        {
+            long long x=b[j]+c[k];
+            if (x==target) ans+=1LL*cntB[j++]*cntC[k--];
+            else
+                if (x>target) k--;
+                else j++;
+        }
+    }
+
+    cout << ans << endl;
+}
