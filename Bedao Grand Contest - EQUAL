@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+#define fi first
+#define se second
+#define io ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+
+using namespace std;
+
+const int MAXN = 1e6 + 7;
+
+int mpr[MAXN] = {};
+
+void sieve()
+{
+    for (int i = 2; i < MAXN; ++i)
+        if (!mpr[i])
+            for (int j = i; j < MAXN; j += i) mpr[j] = i;
+}
+
+int calc(int n)
+{
+    int ret = 0;
+    while (n > 1) n /= mpr[n], ++ret;
+    return ret;
+}
+
+int gcd(int a, int b)
+{
+    if (b == 0) return a;
+    return gcd(b, a % b);
+}
+
+int main()
+{
+    freopen("EQUAL.INP","r",stdin);
+    freopen("EQUAL.OUT","w",stdout);
+    sieve();
+    int q;
+    cin >> q;
+    while (q--)
+    {
+        int res = 0, a, b;
+        cin >> a >> b;
+        int uc = gcd(a, b);
+        a /= uc, b /= uc;
+        cout << max(calc(a), calc(b)) << '\n';
+    }
+    return 0;
+}
