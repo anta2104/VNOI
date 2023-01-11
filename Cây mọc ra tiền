@@ -1,0 +1,65 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef long long ll;
+
+const int N = 3e5 + 5;
+const double EPS = 9;
+
+int n, q;
+int now, tin[N], tout[N];
+double val[N], FT[N];
+vector<int> g[N];
+
+void pre_dfs(int u, int p) {
+    tin[u] = ++now;
+    for (auto v : g[u]) if (v != p) {
+        pre_dfs(v, u);
+    }
+    tout[u] = now;
+}
+
+void update(int i, double val) {
+    for (; i <= n; i += i & -i) FT[i] += val;
+}
+
+double get(int i) {
+    double res = 0;
+    for (; i; i -= i & -i) res += FT[i];
+    return res;
+}
+
+double subtree(int u) {
+    return get(tout[u]) - get(tin[u] - 1);
+}
+
+signed main() {
+    cin.tie(0), cout.tie(0) -> sync_with_stdio(0);
+
+    cout << fixed << setprecision(6);
+
+    cin >> n;
+    for (int i = 1, a, b; i < n; i++) {
+        cin >> a >> b;
+        g[a].push_back(b);
+        g[b].push_back(a);
+    }
+
+    pre_dfs(1, 0);
+
+    cin >> q;
+    for (int t, x, y; q--; ) {
+        cin >> t >> x >> y;
+        if (t == 1) {
+            double p = log10(y);
+            update(tin[x], p - val[x]);
+            val[x] = p;
+        }
+        else {
+            double a = subtree(x), b = subtree(y);
+            double p = min(a - b, EPS);
+
+            cout << pow(10, p) << '\n';
+        }
+    }
+}
