@@ -1,0 +1,15 @@
+#include <iostream>
+
+#include <cstring>
+
+using namespace std;
+
+int main()
+{
+    string s;
+    cin >> s;
+    long unsigned int m = 1000000000;
+    if ((s.find(".py") < m) || (s.find(".Py") < m) || (s.find(".pY") < m) || (s.find(".PY") < m))  cout << "yes" ;
+    else cout << "no";
+    return 0;
+}
