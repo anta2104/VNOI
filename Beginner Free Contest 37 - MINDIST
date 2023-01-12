@@ -1,0 +1,24 @@
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    long long n, MIN = 100000 , temp=0;
+    cin >> n;
+    long long a[n];
+    for (long long i=0 ; i<n ; i++) {
+        cin >> a[i];
+    }
+    
+    for (int i=0; i< n-1; i++)
+        for (long long j=i+1; j<n ; j++) {
+            if (a[i]==a[j]) {
+                temp = j - i;
+                if(temp < MIN) MIN = temp;
+            }
+        }
+    if (MIN !=100000) cout << MIN;
+    else cout << "-1";
+    return 0;
+}
