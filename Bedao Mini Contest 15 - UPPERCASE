@@ -1,0 +1,34 @@
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    string s;
+    string s1;
+    getline(cin, s);
+    
+    s = " " + s;
+    //cin >> s;
+    
+    for (long unsigned int i=0; i < s.size() ; i++) {
+        //cout << int(s[i]) << endl;
+        if (s[i] != ' ') {
+            s1 = s1 + s[i];
+        }
+        else if ((int(s[i+1]) >= 97) && (int(s[i+1]) <= 122) && (s[i] == ' ')) {
+            //cout << "a";
+            s[i+1] = static_cast<char>(int(s[i+1]) - 32);
+            //s1 = s1 + s[i+1];
+        }
+    }
+
+    /*for (int i=0 ; i<s.size(); i++) {
+        if (s[i] != ' ') {
+            s1 = s1 + s[i];
+        }
+    }*/
+    cout << s1;
+
+    return 0;
+}
