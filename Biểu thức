@@ -1,0 +1,30 @@
+int compute() {
+        stack<ii> st; st.push(mp(sign[1], a[1]));
+
+        FOR(i, 2, n) {
+            if (sign[i] == 2) {
+                assert(st.empty() == false);
+                ii u = st.top(); st.pop();
+                u.se = 1LL * u.se * a[i] % modulo;
+                st.push(u);
+            } else st.push(mp(sign[i], a[i]));
+        }
+        int finalSum = 0;
+        while (!st.empty()) {
+            ii u = st.top(); st.pop();
+            finalSum = (finalSum + (u.fi == 0 ? u.se : -u.se)) % modulo;
+        }
+        return finalSum;
+}
+void backtrack(int i) {
+        if (i == n) {
+            if (compute() == 0) res++;
+            return;
+        }
+        REP(j, 3) { // 0 => +; 1 => -; 2 => *;
+            sign[i + 1] = j;
+            backtrack(i + 1);
+        }
+}
+
+backtrack(1);
