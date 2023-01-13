@@ -1,0 +1,206 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define all(x) begin(x), end(x)
+#define sz(x) (int)(x).size()
+typedef long long ll;
+typedef pair<int, int> pii;
+typedef vector<int> vi;
+
+template<class T>
+struct RMQ {
+ vector<vector<T>> jmp;
+ RMQ(const vector<T>& V) : jmp(1, V) {
+     for (int pw = 1, k = 1; pw * 2 <= sz(V); pw *= 2, ++k) {
+         jmp.emplace_back(sz(V) - pw * 2 + 1);
+         rep(j,0,sz(jmp[k]))
+             jmp[k][j] = min(jmp[k - 1][j], jmp[k - 1][j + pw]);
+     }
+ }
+ T query(int a, int b) {
+     assert(a < b); // or return inf if a == b
+     int dep = 31 - __builtin_clz(b - a);
+     return min(jmp[dep][a], jmp[dep][b - (1 << dep)]);
+ }
+};
+
+int main()
+{
+  cin.tie(0)->sync_with_stdio(0);
+
+  int t;
+  cin >> t;
+
+  while (t--)
+  {
+    string s;
+    cin >> s;
+
+    int n = s.size();
+
+    if (n % 2 == 1)
+    {
+      cout << "0\n";
+      continue;
+    }
+
+    int open_count = count(s.begin(), s.end(), '(');
+    int close_count = count(s.begin(), s.end(), ')');
+    int remaining_open = n / 2 - open_count;
+    int remaining_close = n / 2 - close_count;
+    int question_mark_count = count(s.begin(), s.end(), '?');
+
+    if (remaining_open < 0 || remaining_close < 0)
+    {
+      cout << "0\n";
+      continue;
+    }
+
+    vector<int> fill_open_balance_factor(n), fill_close_balance_factor(n);
+
+    {
+      int balance_factor = 0;
+      for (int i = 0; i < n; i++)
+      {
+        if (s[i] == '(' || s[i] == '?') balance_factor++;
+        else balance_factor--;
+
+        fill_open_balance_factor[i] = balance_factor;
+      }
+    }
+
+    {
+      int balance_factor = 0;
+      for (int i = 0; i < n; i++)
+      {
+        if (s[i] == ')' || s[i] == '?') balance_factor--;
+        else balance_factor++;
+
+        fill_close_balance_factor[i] = balance_factor;
+      }
+    }
+
+    RMQ<int> min_fill_open(fill_open_balance_factor), min_fill_close(fill_close_balance_factor);
+
+    // now maintaining the ranges is gonna prove difficult
+
+    vector<int> question_mark_positions(count(s.begin(), s.end(), '?'));
+
+    {
+      int counter = 0;
+      for (int i = 0; i < n; i++)
+      {
+        if (s[i] != '?') continue;
+        question_mark_positions[counter] = i;
+        counter++;
+      }
+    }
+
+    int balance_factor = 0;
+    int counter = 0;
+    int current_open_count = 0;
+    int current_close_count = 0;
+    int current_question_mark_count = 0;
+
+    auto dfs = [&](auto dfs, int index) {
+      if (index == n)
+      {
+        counter++;
+        if (counter >= 10)
+        {
+          counter = 10;
+          return true;
+        }
+        return false;
+      }
+
+      if (s[index] != '?')
+      {
+        if (s[index] == '(') balance_factor++, current_open_count++; else balance_factor--, current_close_count++;
+        if (balance_factor >= 0 && dfs(dfs, index + 1)) return true;
+        if (s[index] == '(') balance_factor--, current_open_count--; else balance_factor++, current_close_count--;
+        return false;
+      }
+
+      current_question_mark_count++;
+
+      auto handle_new_balance_factor = [&]() {
+        int difference = -balance_factor;
+        int sum = n - index - 1;
+        if ((sum + difference) % 2 != 0) return false;
+        int total_open_count = (sum + difference) / 2;
+        int total_close_count = (sum - difference) / 2;
+
+        if (total_open_count < 0 || total_close_count < 0) return false;
+
+        int filled_open_count = open_count - current_open_count;
+        int filled_close_count = close_count - current_close_count;
+
+        int remaining_open_count = total_open_count - filled_open_count;
+        int remaining_close_count = total_close_count - filled_close_count;
+        int remaining_question_mark_count = question_mark_count - current_question_mark_count;
+
+        if (remaining_open_count < 0 || remaining_close_count < 0) return false;
+
+        auto query_fill_open = [&](int left, int right) {
+          return min_fill_open.query(left, right + 1);
+        };
+
+        auto query_fill_close = [&](int left, int right) {
+          return min_fill_close.query(left, right + 1);
+        };
+
+        auto get_min_range_1 = [&]() {
+          return query_fill_open(index + 1, question_mark_positions[current_question_mark_count + remaining_open_count - 1]) - fill_open_balance_factor[index] + balance_factor;
+        };
+        auto get_min_range_2 = [&]() {
+          return query_fill_close(question_mark_positions[current_question_mark_count + remaining_open_count - 1] + 1, n - 1)
+            - fill_close_balance_factor[question_mark_positions[current_question_mark_count + remaining_open_count - 1]]
+            + fill_open_balance_factor[question_mark_positions[current_question_mark_count + remaining_open_count - 1]] - fill_open_balance_factor[index]
+            + balance_factor;
+        };
+
+        int min_balance_factor;
+
+        if (remaining_open_count == 0 && remaining_close_count == 0)
+          min_balance_factor = 0;
+        else if (remaining_open_count == 0)
+          min_balance_factor = get_min_range_2();
+        else if (remaining_close_count == 0)
+          min_balance_factor = get_min_range_1();
+        else
+          min_balance_factor = min(get_min_range_1(), get_min_range_2());
+
+        if (min_balance_factor < 0) return false;
+        if (balance_factor < 0) return false;
+
+        return dfs(dfs, index + 1);
+      };
+
+      int old_balance_factor = balance_factor;
+
+      // probe '('
+      {
+        balance_factor = old_balance_factor + 1;
+        if (handle_new_balance_factor()) return true;
+        balance_factor = old_balance_factor;
+      }
+
+      // probe ')'
+      {
+        balance_factor = old_balance_factor - 1;
+        if (handle_new_balance_factor()) return true;
+        balance_factor = old_balance_factor;
+      }
+
+      current_question_mark_count--;
+
+      return false;
+    };
+
+    dfs(dfs, 0);
+
+    cout << counter << "\n";
+  }
+}
