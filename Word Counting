@@ -1,0 +1,27 @@
+#include <iostream>
+
+using namespace std;
+string split(string str, string delimiter){
+    string a[100000];
+    size_t pos = 0;
+    string token;
+    int i = 0;
+    while ((pos = str.find(delimiter)) != string::npos) {
+        token = str.substr(0, pos);
+        a[i] = token;
+        str.erase(0, pos + delimiter.length());
+        i++;
+    }
+    a[i] = str;
+    return a;
+}    
+ 
+int main() {
+    string s[100000000];
+    s = split("Tom and you and me", " ");
+    for (long long i=0 ; i< s.size() ; i++) {
+        cout << s[i];
+    }
+
+    return 0;
+}
