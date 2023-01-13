@@ -1,0 +1,207 @@
+#include <bits/stdc++.h>
+#define int long long
+
+using namespace std;
+
+typedef vector < int > vi;
+
+// Nạp chồng toán tử nhập luồng, dùng để nhập vào số lớn.
+istream &operator >> (istream &cin, vi &a)
+{
+    string s;
+    cin >> s;
+
+    a.clear();
+    for (int i = 0; i < s.size(); ++i)
+        a.push_back(s[i] - '0');
+
+    return a, cin;
+}
+
+// Nạp chồng toán tử trích luồng, dùng để in ra số lớn.
+ostream &operator << (ostream &cout, const vi &a) 
+{
+   	for (auto d: a) 
+        cout << d;
+
+   	return cout;
+} 
+
+// Viết thêm các số 0 ở đầu một số nguyên lớn a.
+void add_zero(vi &a, int sz) 
+{	
+    // Đảo ngược vector lại để tối ưu thời gian khi thêm số 0 vào.
+    reverse(a.begin(),a.end()); 
+
+    while (a.size() < sz) 
+        a.push_back(0); 
+
+    reverse(a.begin(), a.end());
+}
+
+// Xóa các số 0 vô nghĩa ở đầu một số nguyên lớn a.
+void del_zero(vi &a) 
+{ 	
+    reverse(a.begin(), a.end()); 
+	
+    while (a.size() >= 2) 
+    {
+        if (a.back() == 0) 
+            a.pop_back();
+        else 
+            break;
+    }
+
+    reverse(a.begin(), a.end());
+}
+
+// Cân bằng độ dài hai số a và b bằng cách thêm các số 0 vào đầu.
+void change(vi &a, vi &b) 
+{ 
+    int sz = max(a.size(), b.size());
+    add_zero(a, sz);
+    add_zero(b, sz);
+}
+
+// Các phép toán so sánh.
+bool operator < (vi a, vi b) 
+{
+    change(a, b);
+
+    for (int i = 0; i < a.size(); ++i) 
+        if (a[i] < b[i]) 
+            return true;
+        else if (a[i] > b[i]) 
+            return false;
+	
+    return false;
+}
+
+bool operator > (vi a, vi b) 
+{
+    change(a, b);
+	
+    for (int i = 0; i < a.size(); ++i) 
+        if (a[i] > b[i]) 
+            return true;
+        else if (a[i] < b[i]) 
+            return false;
+
+    return false;
+}
+
+bool operator <= (vi a, vi b) 
+{
+    change(a, b);
+	
+    for (int i = 0; i < a.size(); ++i) 
+        if (a[i] < b[i]) 
+            return true;
+        else if (a[i] > b[i]) 
+            return false;
+	
+    return true;
+}
+
+bool operator >= (vi a, vi b) 
+{
+    change(a, b);
+	
+    for (int i = 0; i < a.size(); ++i) 
+        if (a[i] > b[i]) 
+            return true;
+        else if (a[i] < b[i]) 
+            return false;
+	
+    return true;
+}
+
+bool operator == (vi a, vi b) 
+{
+    change(a, b);
+	
+    for (int i = 0; i < a.size(); ++i) 
+        if (a[i] != b[i]) return false;
+
+    return true;
+}
+
+// Phép toán cộng.
+vi operator + (vi a, vi b) 
+{
+    change(a, b);
+
+    int sz = a.size();
+    vi c;
+	
+    int rem = 0; 
+    for (int i = sz - 1; i >= 0; --i) 
+    {
+        int x = a[i] + b[i] + rem;
+        rem = x / 10; 
+        x %= 10;
+        c.push_back(x);
+    }
+	
+    c.push_back(rem);
+    reverse(c.begin(), c.end());
+    del_zero(c);
+	
+    return c;
+}
+
+// Phép toán trừ.
+vi operator - (vi a, vi b) 
+{
+    change(a, b);
+	
+    int sz = a.size();
+    vi c;
+	
+    int rem = 0;
+    for (int i = sz - 1; i >= 0; --i) 
+    {
+        int x = a[i] - b[i] - rem;
+        if (x < 0) 
+        {
+            x += 10;
+            rem = 1;
+        }
+        else 
+            rem = 0;
+		
+        c.push_back(x);
+    }
+	
+    reverse(c.begin(), c.end());
+    del_zero(c);
+	
+    return c;
+}
+
+// Test.
+main() 
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    vi a, b;
+    cin >> a >> b;
+
+    if (a < b) 
+        cout << "a < b\n";
+    else if (b < a) 
+        cout << "a > b\n";
+    else if (a == b) 
+        cout << "a = b\n";
+
+    cout << a + b << '\n';
+
+    // Phải đảm bảo a >= b để thực hiện phép trừ.
+    if (a < b) 
+        swap(a, b); 
+    cout << a - b << '\n';
+
+    return 0;
+} 
+
