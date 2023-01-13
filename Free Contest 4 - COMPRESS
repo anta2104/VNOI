@@ -1,0 +1,26 @@
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    string s , s1 = "",s2;
+    int count=0;
+    cin >> s;
+    for (int i=0; i<s.size(); i++) {
+        count = 0;
+        s1 = s1+ s[i];
+        s2 = "";
+        while (s2.size() < s.size()) {
+            s2 = s2 + s1 ;
+            count ++;
+        }
+        if (s2 == s) {
+            cout << count << s1 ;
+            break;
+        } 
+    
+    }
+    
+    return 0;
+}
