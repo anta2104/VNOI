@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int N=1000005;
+int n,q,cnt=0,head[N],size[N];
+char c[5];
+bool vis[N];
+struct node{
+int to,nxt;
+}e[N<<1];
+
+inline void add(int u,int v){
+e[++cnt].to=v;
+e[cnt].nxt=head[u];
+head[u]=cnt;
+}
+
+void dfs(int u){
+size[u]=1;
+for(int i=head[u];i;i=e[i].nxt){
+int v=e[i].to;
+if(vis[v]) continue;
+dfs(v);
+size[u]+=size[v];
+}
+}
+
+int main(){
+scanf("%d",&q);
+while(q--){
+scanf("%s%d",c,&n);
+if(c[0]=='+'){
+int fa;
+scanf("%d",&fa);
+add(fa,++n);
+vis[n]=0;
+}
+else if(c[0]=='-'){
+vis[n]=1;
+}
+else{
+dfs(n);
+printf("%d\n",size[n]);
+}
+}
+return 0;
+}
